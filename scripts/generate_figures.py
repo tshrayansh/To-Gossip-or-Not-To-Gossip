@@ -1,19 +1,24 @@
 """
-Generates publication-quality figures for the BEE26 mathematical model:
+Generates publication-quality figures for:
 "To Gossip or Not To Gossip: The Evolution of Cooperation Under Horizontal Gene Transfer"
 
-Strict Design Rules Enforced:
-1. NO text anywhere inside the graph data area (no ax.text inside axes).
-   Data area contains ONLY data curves and background shading.
-2. Single unified legend placed ONCE outside in multi-panel figures.
-3. Legends in single plots placed strictly outside the axes area.
-4. Consistent font, line styles, and color palette across all figures.
+Strict Cleanliness & Design Rules Enforced:
+1. NO slide names or slide numbers in figure names or titles.
+2. NO text anywhere inside the graph data area (zero overlap guaranteed).
+3. Single unified shared legend placed once outside in multi-panel figures.
+4. Legends in single plots placed strictly outside the axes area.
+5. Consistent typography, line styles, and color palette across all figures.
 """
 
 import os
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
+
+# Ensure repository root is on Python path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from models.simulation import (
     base_model_ode,
     independent_plasmid_ode,
@@ -23,8 +28,9 @@ from models.simulation import (
     parameter_sweep
 )
 
-# Ensure figures directory exists
-os.makedirs("figures", exist_ok=True)
+# Output directory
+FIGURES_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "figures"))
+os.makedirs(FIGURES_DIR, exist_ok=True)
 
 # -------------------------------------------------------------
 # Global Typography & Style Configuration
@@ -69,7 +75,7 @@ SHADE_COEX = "#fff9c4"      # Soft Amber
 SHADE_SC_PLUS = "#f3e5f5"   # Soft Purple
 SHADE_GC = "#e3f2fd"        # Soft Blue
 
-# Simulation parameters
+# Common parameters
 fc = 0.2
 fs = 0.1
 alpha = 0.1
@@ -77,9 +83,9 @@ ratios = np.linspace(0.0, 2.0, 101)
 
 
 # =============================================================
-# 1. Base Model Bifurcation (Slide 10)
+# 1. Base Model Steady State
 # =============================================================
-print("Generating: slide10_base_model_result.png")
+print("Generating: base_model_steady_state.png")
 y0_base = [0.25, 0.25, 0.25, 0.25]
 results_base = parameter_sweep(
     base_model_ode,
@@ -95,17 +101,16 @@ ax.plot(ratios, results_base[:, 1], label="GD (Generous Defector)", color=COLOR_
 ax.plot(ratios, results_base[:, 2], label="SC (Secretive Cooperator)", color=COLOR_SC, linestyle=":", linewidth=2.0)
 ax.plot(ratios, results_base[:, 3], label="SD (Secretive Defector)", color=COLOR_SD, linestyle="-", linewidth=3.0)
 
-ax.set_title("Base Model — Steady State vs $f_s / f_c$ (Slide 10)", pad=14)
+ax.set_title("Base Model: Steady-State Population vs $f_s / f_c$", pad=14)
 ax.set_xlabel(r"Ratio of HGT Cost to Cooperation Cost ($f_s / f_c$)")
 ax.set_ylabel("Steady-State Fraction ($x_i^*$)")
 ax.set_xlim(0.0, 2.0)
 ax.set_ylim(-0.02, 1.05)
 
-# Legend placed outside on the right - ZERO text in data area!
 ax.legend(bbox_to_anchor=(1.02, 1.0), loc="upper left", framealpha=0.95, borderpad=0.7, edgecolor="#cccccc")
 
 plt.tight_layout()
-plt.savefig("figures/slide10_base_model_result.png")
+plt.savefig(os.path.join(FIGURES_DIR, "base_model_steady_state.png"))
 plt.close()
 
 
@@ -120,7 +125,7 @@ ax.plot(t_eval, y_traj_base[1], label="GD (Generous Defector)", color=COLOR_GD, 
 ax.plot(t_eval, y_traj_base[2], label="SC (Secretive Cooperator)", color=COLOR_SC, linestyle=":", linewidth=2.0)
 ax.plot(t_eval, y_traj_base[3], label="SD (Secretive Defector)", color=COLOR_SD, linestyle="-", linewidth=3.0)
 
-ax.set_title("Base Model — Population Trajectory over Time ($f_s=0.1, f_c=0.2, \\alpha=0.1$)", pad=14)
+ax.set_title("Base Model: Population Trajectory over Time", pad=14)
 ax.set_xlabel("Time ($t$, generations)")
 ax.set_ylabel("Population Fraction ($x_i$)")
 ax.set_xlim(0, 100)
@@ -129,14 +134,14 @@ ax.set_ylim(-0.02, 1.04)
 ax.legend(bbox_to_anchor=(1.02, 1.0), loc="upper left", framealpha=0.95, borderpad=0.7, edgecolor="#cccccc")
 
 plt.tight_layout()
-plt.savefig("figures/base_model_trajectory.png")
+plt.savefig(os.path.join(FIGURES_DIR, "base_model_trajectory.png"))
 plt.close()
 
 
 # =============================================================
-# 3. Independent Beneficial Plasmid Model (Slide 15)
+# 3. Independent Beneficial Plasmid Model Steady State
 # =============================================================
-print("Generating: slide15_independent_plasmid_result.png")
+print("Generating: independent_plasmid_steady_state.png")
 fplus = 0.3
 y0_indep = [1/8.0] * 8
 results_indep = parameter_sweep(
@@ -160,7 +165,7 @@ ax.plot(ratios, total_sc, label="SC Total ($SC_+ + SC_-$)", color=COLOR_SC, line
 ax.plot(ratios, total_sd, label=r"SD Total ($SD_+ + SD_-$)", color=COLOR_SD, linestyle="-", linewidth=3.0)
 ax.plot(ratios, sd_plus, label=r"$SD_+$ (Plasmid Defector)", color=COLOR_SD_PLUS, linestyle="--", linewidth=2.0)
 
-ax.set_title("Independent Beneficial Plasmid Model — Steady State (Slide 15)", pad=14)
+ax.set_title("Independent Beneficial Plasmid Model: Steady-State vs $f_s / f_c$", pad=14)
 ax.set_xlabel(r"Ratio of HGT Cost to Cooperation Cost ($f_s / f_c$)")
 ax.set_ylabel("Steady-State Fraction ($x_i^*$)")
 ax.set_xlim(0.0, 2.0)
@@ -169,7 +174,7 @@ ax.set_ylim(-0.02, 1.05)
 ax.legend(bbox_to_anchor=(1.02, 1.0), loc="upper left", framealpha=0.95, borderpad=0.7, edgecolor="#cccccc")
 
 plt.tight_layout()
-plt.savefig("figures/slide15_independent_plasmid_result.png")
+plt.savefig(os.path.join(FIGURES_DIR, "independent_plasmid_steady_state.png"))
 plt.close()
 
 
@@ -185,7 +190,7 @@ ax.plot(t_eval, y_traj_indep[4] + y_traj_indep[5], label="SC Total ($SC_+ + SC_-
 ax.plot(t_eval, y_traj_indep[6], label="$SD_+$ (Plasmid Defector)", color=COLOR_SD, linestyle="-", linewidth=3.0)
 ax.plot(t_eval, y_traj_indep[7], label="$SD_-$ (Plasmid-Free Defector)", color=COLOR_SD_PLUS, linestyle=":", linewidth=2.0)
 
-ax.set_title("Independent Beneficial Plasmid Model — Trajectory over Time", pad=14)
+ax.set_title("Independent Beneficial Plasmid Model: Population Trajectory over Time", pad=14)
 ax.set_xlabel("Time ($t$, generations)")
 ax.set_ylabel("Population Fraction ($x_i$)")
 ax.set_xlim(0, 100)
@@ -194,14 +199,14 @@ ax.set_ylim(-0.02, 1.04)
 ax.legend(bbox_to_anchor=(1.02, 1.0), loc="upper left", framealpha=0.95, borderpad=0.7, edgecolor="#cccccc")
 
 plt.tight_layout()
-plt.savefig("figures/independent_plasmid_trajectory.png")
+plt.savefig(os.path.join(FIGURES_DIR, "independent_plasmid_trajectory.png"))
 plt.close()
 
 
 # =============================================================
-# 5. Dependent Beneficial Plasmid Model (Slide 20)
+# 5. Dependent Beneficial Plasmid Model Steady State
 # =============================================================
-print("Generating: slide20_dependent_plasmid_result.png")
+print("Generating: dependent_plasmid_steady_state.png")
 ratios_fplus = np.linspace(0.0, 2.0, 101)
 y0_dep = [1/6.0] * 6
 results_dep = parameter_sweep(
@@ -213,7 +218,7 @@ results_dep = parameter_sweep(
 )
 
 fig, ax = plt.subplots(figsize=(8.8, 4.8))
-# Shaded background zones (no text inside data area!)
+# Clean background shading
 ax.axvspan(0.0, 0.95, color=SHADE_SD, alpha=0.35)
 ax.axvspan(0.95, 1.05, color=SHADE_COEX, alpha=0.6)
 ax.axvspan(1.05, 2.0, color=SHADE_SC_PLUS, alpha=0.35)
@@ -223,7 +228,7 @@ ax.plot(ratios_fplus, results_dep[:, 2], label="GD", color=COLOR_GD, linestyle="
 ax.plot(ratios_fplus, results_dep[:, 3], label=r"$SC_+$ (Beneficial Cooperator)", color=COLOR_SC_PLUS, linestyle="-", linewidth=3.0)
 ax.plot(ratios_fplus, results_dep[:, 5], label="SD (Secretive Defector)", color=COLOR_SD, linestyle="-", linewidth=3.0)
 
-ax.set_title("Dependent Beneficial Plasmid Model — Steady State vs $f_+ / f_c$ (Slide 20)", pad=14)
+ax.set_title("Dependent Beneficial Plasmid Model: Steady-State vs $f_+ / f_c$", pad=14)
 ax.set_xlabel(r"Ratio of Plasmid Benefit to Cooperation Cost ($f_+ / f_c$)")
 ax.set_ylabel("Steady-State Fraction ($x_i^*$)")
 ax.set_xlim(0.0, 2.0)
@@ -232,7 +237,7 @@ ax.set_ylim(-0.02, 1.05)
 ax.legend(bbox_to_anchor=(1.02, 1.0), loc="upper left", framealpha=0.95, borderpad=0.7, edgecolor="#cccccc")
 
 plt.tight_layout()
-plt.savefig("figures/slide20_dependent_plasmid_result.png")
+plt.savefig(os.path.join(FIGURES_DIR, "dependent_plasmid_steady_state.png"))
 plt.close()
 
 
@@ -264,7 +269,7 @@ ax2.set_title("Supercritical Regime: $f_+ / f_c = 1.5$ ($SC_+$ Fixation)", pad=1
 ax2.set_xlabel("Time ($t$, generations)")
 ax2.set_xlim(0, 120)
 
-# SINGLE shared legend placed ONCE at top outside the data area
+# SINGLE shared legend placed ONCE at top outside data area
 legend_elements = [
     Line2D([0], [0], color=COLOR_GC, linestyle="--", linewidth=2.0, label="GC"),
     Line2D([0], [0], color=COLOR_GD, linestyle="-.", linewidth=2.0, label="GD"),
@@ -275,14 +280,14 @@ fig.legend(handles=legend_elements, loc="upper center", bbox_to_anchor=(0.5, 1.0
 
 plt.tight_layout()
 plt.subplots_adjust(top=0.86)
-plt.savefig("figures/dependent_plasmid_trajectory.png")
+plt.savefig(os.path.join(FIGURES_DIR, "dependent_plasmid_trajectory.png"))
 plt.close()
 
 
 # =============================================================
-# 7. Plasmid-Chromosome Synergy Model (Slide 24)
+# 7. Plasmid-Chromosome Synergy Model Steady State
 # =============================================================
-print("Generating: slide24_synergy_model_result.png")
+print("Generating: synergy_model_steady_state.png")
 ratios_fpc = np.linspace(0.0, 2.0, 101)
 y0_synergy = [0.25, 0.25, 0.25, 0.25]
 results_synergy = parameter_sweep(
@@ -304,7 +309,7 @@ ax.plot(ratios_fpc, results_synergy[:, 1], label="GD (Generous Defector)", color
 ax.plot(ratios_fpc, results_synergy[:, 2], label="SC (Secretive Cooperator)", color=COLOR_SC, linestyle=":", linewidth=2.0)
 ax.plot(ratios_fpc, results_synergy[:, 3], label="SD (Secretive Defector)", color=COLOR_SD, linestyle="-", linewidth=3.0)
 
-ax.set_title(r"Plasmid–Chromosome Synergy Model — Steady State (Slide 24)", pad=14)
+ax.set_title(r"Plasmid–Chromosome Synergy Model: Steady-State vs Synergy Ratio $\Gamma$", pad=14)
 ax.set_xlabel(r"Synergy Parameter $\Gamma = f_{pc} / (f_s + f_c)$")
 ax.set_ylabel("Steady-State Fraction ($x_i^*$)")
 ax.set_xlim(0.0, 2.0)
@@ -313,7 +318,7 @@ ax.set_ylim(-0.02, 1.05)
 ax.legend(bbox_to_anchor=(1.02, 1.0), loc="upper left", framealpha=0.95, borderpad=0.7, edgecolor="#cccccc")
 
 plt.tight_layout()
-plt.savefig("figures/slide24_synergy_model_result.png")
+plt.savefig(os.path.join(FIGURES_DIR, "synergy_model_steady_state.png"))
 plt.close()
 
 
@@ -356,7 +361,7 @@ fig.legend(handles=legend_elements_syn, loc="upper center", bbox_to_anchor=(0.5,
 
 plt.tight_layout()
 plt.subplots_adjust(top=0.86)
-plt.savefig("figures/synergy_model_trajectory.png")
+plt.savefig(os.path.join(FIGURES_DIR, "synergy_model_trajectory.png"))
 plt.close()
 
 
@@ -431,7 +436,7 @@ fig.legend(handles=shared_legend, loc="upper center", bbox_to_anchor=(0.5, 0.98)
 
 plt.suptitle("Evolutionary Dynamics of Horizontal Gene Transfer: 4-Model Comparison", fontsize=15, y=1.02)
 plt.subplots_adjust(top=0.88, hspace=0.30, wspace=0.18)
-plt.savefig("figures/model_comparison_overview.png", bbox_inches="tight")
+plt.savefig(os.path.join(FIGURES_DIR, "model_comparison_overview.png"), bbox_inches="tight")
 plt.close()
 
-print("All 9 figures generated strictly following the no-text-in-data-area rule!")
+print("All figures successfully generated in figures/ without slide references!")

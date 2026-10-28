@@ -5,7 +5,7 @@
 [![Jupyter Notebook](https://img.shields.io/badge/Notebook-BEE26-orange.svg)](BEE26_To_Gossip_or_Not_To_Gossip.ipynb)
 [![Course](https://img.shields.io/badge/IMSc-BEE%202026-green.svg)](https://www.imsc.res.in/)
 
-A mathematical and computational reconstruction of the evolutionary dynamics of **Horizontal Gene Transfer (HGT)** and **bacterial cooperation** in public goods games, originally presented at the **Behavior, Evolution, Emergence 2026 (BEE 2026)** workshop at **The Institute of Mathematical Sciences (IMSc), Chennai**.
+A mathematical and computational investigation of the evolutionary dynamics of **Horizontal Gene Transfer (HGT)** and **bacterial cooperation** in public goods games, developed during the **Behavior, Evolution, Emergence 2026 (BEE 2026)** workshop at **The Institute of Mathematical Sciences (IMSc), Chennai**.
 
 ---
 
@@ -52,7 +52,7 @@ In a **bacterial public goods game** (such as iron-scavenging siderophore secret
 
 ## 📊 Master Overview: 4-Model Comparison
 
-The figure below summarizes the steady-state outcomes across the four evolutionary models reconstructed from the BEE26 presentation:
+The figure below summarizes the steady-state outcomes across the four evolutionary models:
 
 ![Master Comparison Overview](figures/model_comparison_overview.png)
 
@@ -108,7 +108,7 @@ $$\sum_i \dot{x}_i = \sum_i (f_i - \bar{f})x_i + \alpha GC \cdot GD - \alpha GC 
 
 ### Results & Inferences
 <p align="center">
-  <img src="figures/slide10_base_model_result.png" width="48%" />
+  <img src="figures/base_model_steady_state.png" width="48%" />
   <img src="figures/base_model_trajectory.png" width="48%" />
 </p>
 
@@ -152,7 +152,7 @@ $$\begin{aligned}
 
 ### Results & Inferences
 <p align="center">
-  <img src="figures/slide15_independent_plasmid_result.png" width="48%" />
+  <img src="figures/independent_plasmid_steady_state.png" width="48%" />
   <img src="figures/independent_plasmid_trajectory.png" width="48%" />
 </p>
 
@@ -187,7 +187,7 @@ $$f_{SC_+} - f_{SD} = (1 + f_s - f_c + f_+) - (1 + f_s) = f_+ - f_c$$
 
 ### Results & Inferences
 <p align="center">
-  <img src="figures/slide20_dependent_plasmid_result.png" width="48%" />
+  <img src="figures/dependent_plasmid_steady_state.png" width="48%" />
   <img src="figures/dependent_plasmid_trajectory.png" width="48%" />
 </p>
 
@@ -221,7 +221,7 @@ $$f_{GC} - f_{SD} = f_{pc} - (f_s + f_c)$$
 
 ### Results & Inferences
 <p align="center">
-  <img src="figures/slide24_synergy_model_result.png" width="48%" />
+  <img src="figures/synergy_model_steady_state.png" width="48%" />
   <img src="figures/synergy_model_trajectory.png" width="48%" />
 </p>
 
@@ -262,27 +262,29 @@ While this deterministic well-mixed model uncovers the core evolutionary dynamic
 ## 💻 Project Structure & Execution
 
 ```
-├── BEE26_To_Gossip_or_Not_To_Gossip.ipynb  # Fully executed, publication-grade Jupyter Notebook
-├── BEE26.pdf                               # Original presentation slides (IMSc BEE 2026)
-├── generate_figures.py                     # Script generating all 9 publication-grade figures
-├── build_and_run_notebook.py               # Notebook build and execution pipeline
+├── BEE26_To_Gossip_or_Not_To_Gossip.ipynb  # Interactive, fully executed Jupyter Notebook
 ├── models/
+│   ├── __init__.py                         # Package initialization
 │   └── simulation.py                       # Modular ODE functions, solvers, and sweep helpers
-├── figures/                                # Generated high-resolution plots (PNG)
+├── scripts/
+│   └── generate_figures.py                 # Script generating all publication-grade figures
+├── figures/                                # Publication-grade plots (300 DPI, zero overlap)
 │   ├── model_comparison_overview.png
-│   ├── slide10_base_model_result.png
+│   ├── base_model_steady_state.png
 │   ├── base_model_trajectory.png
-│   ├── slide15_independent_plasmid_result.png
+│   ├── independent_plasmid_steady_state.png
 │   ├── independent_plasmid_trajectory.png
-│   ├── slide20_dependent_plasmid_result.png
+│   ├── dependent_plasmid_steady_state.png
 │   ├── dependent_plasmid_trajectory.png
-│   ├── slide24_synergy_model_result.png
+│   ├── synergy_model_steady_state.png
 │   └── synergy_model_trajectory.png
-└── README.md                               # Comprehensive documentation & research report
+├── archive/                                # Archived reference materials and build scripts
+│   ├── BEE26.pdf                           # Reference presentation slides
+│   └── build_and_run_notebook.py           # Notebook builder pipeline
+└── README.md                               # Project documentation & research report
 ```
 
 ### Running the Notebook
-To inspect the interactive code, derivations, and dynamic plots:
 ```bash
 # Clone the repository
 git clone https://github.com/tshrayansh/The-Evolution-of-Cooperation-Under-Horizontal-Gene-Transfer.git
@@ -294,7 +296,7 @@ jupyter notebook BEE26_To_Gossip_or_Not_To_Gossip.ipynb
 
 ### Regenerating Figures
 ```bash
-python3 generate_figures.py
+python3 scripts/generate_figures.py
 ```
 
 ---

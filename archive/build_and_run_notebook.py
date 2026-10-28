@@ -1,10 +1,16 @@
 """
-Script to build and execute BEE26_To_Gossip_or_Not_To_Gossip.ipynb with strict zero-overlap graphics.
-Rule: Zero text in the graph data area. Shared single legend in multi-panel figures.
+Script to build and execute BEE26_To_Gossip_or_Not_To_Gossip.ipynb with clean, professional titles.
+Strictly removes all slide numbers and internal slide references.
 """
 
+import os
+import sys
 import nbformat as nbf
 from nbclient import NotebookClient
+
+# Ensure root is on path
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, ROOT_DIR)
 
 nb = nbf.v4.new_notebook()
 nb.metadata = {
@@ -39,7 +45,7 @@ Horizontal Gene Transfer (HGT) is the lateral transfer of genetic material betwe
 
 Yet, over **80% of bacterial genomes** across history have been acquired through HGT. Why is HGT so pervasive when individual selection strongly penalizes costly gene donation?
 
-This project systematically reconstructs the mathematical framework presented at **BEE 2026 (IMSc)** to explore the evolutionary dynamics of HGT in the context of a **bacterial public goods game** (e.g., siderophore secretion). We formulate, simulate, and analyze four progressive mathematical models:
+This project investigates the evolutionary dynamics of HGT in the context of a **bacterial public goods game** (e.g., siderophore secretion). We formulate, simulate, and analyze four progressive mathematical models:
 
 1. **Base Model:** Standard replicator-conjugation dynamics with costs of cooperation ($f_c$) and HGT ($f_s$).
 2. **Independent Beneficial Plasmid Model:** Universal fitness gain ($f_+$) carried on a mobile plasmid across 8 bacterial phenotypes.
@@ -98,7 +104,7 @@ print("Simulation environment and styling system loaded successfully.")
 
 # Section 1: Base Model
 cells.append(nbf.v4.new_markdown_cell(r"""---
-## 1. Model 1: The Base Model (Slides 7–10)
+## 1. Model 1: The Base Model
 
 ### 1.1 Strategy Space & Normalization
 The bacterial population is partitioned across two binary traits:
@@ -170,7 +176,7 @@ fs = 0.1
 
 sol_base = spi.solve_ivp(base_model_ode, t_span, y0, args=(alpha, fc, fs), t_eval=t_eval, method='RK45')
 
-# 2. Parameter sweep vs fs / fc (Slide 10)
+# 2. Parameter sweep vs fs / fc
 ratios = np.linspace(0.0, 2.0, 101)
 base_sweep = []
 for r in ratios:
@@ -193,13 +199,13 @@ ax1.set_ylabel("Population Fraction ($x_i$)")
 ax1.set_xlim(0, 100)
 ax1.set_ylim(-0.02, 1.05)
 
-# Subplot 2: Bifurcation (Slide 10)
+# Subplot 2: Bifurcation
 ax2.plot(ratios, base_sweep[:, 0], color=COLOR_GC, linestyle="--", linewidth=2.0)
 ax2.plot(ratios, base_sweep[:, 1], color=COLOR_GD, linestyle="-.", linewidth=2.0)
 ax2.plot(ratios, base_sweep[:, 2], color=COLOR_SC, linestyle=":", linewidth=2.0)
 ax2.plot(ratios, base_sweep[:, 3], color=COLOR_SD, linestyle="-", linewidth=3.0)
 ax2.axvspan(0.0, 2.0, color=SHADE_SD, alpha=0.35)
-ax2.set_title("Base Model: Steady State vs $f_s / f_c$ (Slide 10)", pad=10)
+ax2.set_title("Base Model: Steady State vs $f_s / f_c$", pad=10)
 ax2.set_xlabel(r"Ratio of HGT Cost to Cooperation Cost ($f_s / f_c$)")
 ax2.set_xlim(0.0, 2.0)
 
@@ -227,7 +233,7 @@ cells.append(nbf.v4.new_markdown_cell(r"""### Inferences from Base Model
 
 # Section 2: Independent Beneficial Plasmid Model
 cells.append(nbf.v4.new_markdown_cell(r"""---
-## 2. Model 2: Independent Beneficial Plasmid Model (Slides 11–15)
+## 2. Model 2: Independent Beneficial Plasmid Model
 
 ### 2.1 Eight Population Types
 To test whether an independently beneficial plasmid can rescue HGT, an autonomous plasmid conferring a fitness increment $f_+$ is introduced. The population is classified into $2^3 = 8$ types:
@@ -291,7 +297,7 @@ y0_indep = [1/8.0] * 8
 fplus = 0.3
 sol_indep = spi.solve_ivp(independent_plasmid_ode, t_span, y0_indep, args=(alpha, fc, fs, fplus), t_eval=t_eval, method='RK45')
 
-# 2. Parameter sweep vs fs / fc (Slide 15)
+# 2. Parameter sweep vs fs / fc
 indep_sweep = []
 for r in ratios:
     sol = spi.solve_ivp(independent_plasmid_ode, (0, 200), y0_indep, args=(alpha, fc, r * fc, fplus), method='RK45')
@@ -314,7 +320,7 @@ ax1.set_ylabel("Population Fraction ($x_i$)")
 ax1.set_xlim(0, 100)
 ax1.set_ylim(-0.02, 1.05)
 
-# Subplot 2: Bifurcation (Slide 15)
+# Subplot 2: Bifurcation
 total_sd = indep_sweep[:, 6] + indep_sweep[:, 7]
 total_gc = indep_sweep[:, 0] + indep_sweep[:, 1]
 total_gd = indep_sweep[:, 2] + indep_sweep[:, 3]
@@ -326,7 +332,7 @@ ax2.plot(ratios, total_sc, color=COLOR_SC, linestyle=":", linewidth=2.0)
 ax2.plot(ratios, total_sd, color=COLOR_SD, linestyle="-", linewidth=3.0)
 ax2.plot(ratios, indep_sweep[:, 6], color=COLOR_SD_PLUS, linestyle="--", linewidth=2.0)
 ax2.axvspan(0.0, 2.0, color=SHADE_SD, alpha=0.35)
-ax2.set_title("Independent Plasmid: Steady State vs $f_s / f_c$ (Slide 15)", pad=10)
+ax2.set_title("Independent Plasmid: Steady State vs $f_s / f_c$", pad=10)
 ax2.set_xlabel(r"Ratio of HGT Cost to Cooperation Cost ($f_s / f_c$)")
 ax2.set_xlim(0.0, 2.0)
 
@@ -354,7 +360,7 @@ cells.append(nbf.v4.new_markdown_cell(r"""### Inferences from Independent Benefi
 
 # Section 3: Dependent Beneficial Plasmid Model
 cells.append(nbf.v4.new_markdown_cell(r"""---
-## 3. Model 3: Dependent Beneficial Plasmid Model (Slides 16–20)
+## 3. Model 3: Dependent Beneficial Plasmid Model
 
 ### 3.1 Six Population Types & Conditional Fitness
 To link plasmid propagation to sociality, we assume that the plasmid confers a fitness benefit **only when expressed in cooperative hosts** (e.g., public goods machinery enhances plasmid retention, or plasmid carries an enzyme that complements cooperative metabolism).
@@ -404,7 +410,7 @@ cells.append(nbf.v4.new_code_cell(r"""def dependent_plasmid_ode(t, y, alpha, fc,
     
     return [dGC_p, dGC_m, dGD, dSC_p, dSC_m, dSD]
 
-# Parameter sweep vs f+ / fc (Slide 20)
+# Parameter sweep vs f+ / fc
 ratios_fplus = np.linspace(0.0, 2.0, 101)
 y0_dep = [1/6.0] * 6
 dep_sweep = []
@@ -425,7 +431,7 @@ ax.plot(ratios_fplus, dep_sweep[:, 2], label="GD", color=COLOR_GD, linestyle="-.
 ax.plot(ratios_fplus, dep_sweep[:, 3], label=r"$SC_+$ (Beneficial Cooperator)", color=COLOR_SC_PLUS, linestyle="-", linewidth=3.0)
 ax.plot(ratios_fplus, dep_sweep[:, 5], label="SD (Secretive Defector)", color=COLOR_SD, linestyle="-", linewidth=3.0)
 
-ax.set_title("Dependent Beneficial Plasmid Model — Steady State vs $f_+ / f_c$ (Slide 20)", pad=14)
+ax.set_title("Dependent Beneficial Plasmid Model: Steady-State vs $f_+ / f_c$", pad=14)
 ax.set_xlabel(r"Ratio of Plasmid Benefit to Cooperation Cost ($f_+ / f_c$)")
 ax.set_ylabel("Steady-State Fraction ($x_i^*$)")
 ax.set_xlim(0.0, 2.0)
@@ -445,7 +451,7 @@ cells.append(nbf.v4.new_markdown_cell(r"""### Inferences from Dependent Benefici
 
 # Section 4: Plasmid-Chromosome Synergy Model
 cells.append(nbf.v4.new_markdown_cell(r"""---
-## 4. Model 4: Plasmid–Chromosome Synergy Model (Slides 21–24)
+## 4. Model 4: Plasmid–Chromosome Synergy Model
 
 ### 4.1 Positive Epistasis Between Chromosome & Plasmid
 In nature, chromosomal genes encoding HGT machinery often exhibit **positive epistasis (synergy)** with plasmid genes (San Millan et al., 2014, *ISME Journal*). For instance, chromosomal relaxases and plasmid partition systems co-optimize cellular metabolism.
@@ -498,7 +504,7 @@ cells.append(nbf.v4.new_code_cell(r"""def synergy_model_ode(t, y, alpha, fc, fs,
     dSD = (f_SD - f_bar) * SD - alpha * GC * SD
     return [dGC, dGD, dSC, dSD]
 
-# Parameter sweep vs f_pc / (f_s + f_c) (Slide 24)
+# Parameter sweep vs f_pc / (f_s + f_c)
 ratios_fpc = np.linspace(0.0, 2.0, 101)
 y0_synergy = [0.25, 0.25, 0.25, 0.25]
 synergy_sweep = []
@@ -519,7 +525,7 @@ ax.plot(ratios_fpc, results_synergy[:, 1], label="GD (Generous Defector)", color
 ax.plot(ratios_fpc, results_synergy[:, 2], label="SC (Secretive Cooperator)", color=COLOR_SC, linestyle=":", linewidth=2.0)
 ax.plot(ratios_fpc, results_synergy[:, 3], label="SD (Secretive Defector)", color=COLOR_SD, linestyle="-", linewidth=3.0)
 
-ax.set_title(r"Plasmid–Chromosome Synergy Model — Steady State (Slide 24)", pad=14)
+ax.set_title(r"Plasmid–Chromosome Synergy Model: Steady-State vs Synergy Ratio $\Gamma$", pad=14)
 ax.set_xlabel(r"Synergy Parameter $\Gamma = f_{pc} / (f_s + f_c)$")
 ax.set_ylabel("Steady-State Fraction ($x_i^*$)")
 ax.set_xlim(0.0, 2.0)
@@ -660,7 +666,7 @@ This study is a reconstruction of the team research project conducted during **B
 nb.cells = cells
 
 # Save and execute notebook
-notebook_path = "BEE26_To_Gossip_or_Not_To_Gossip.ipynb"
+notebook_path = os.path.join(ROOT_DIR, "BEE26_To_Gossip_or_Not_To_Gossip.ipynb")
 with open(notebook_path, "w", encoding="utf-8") as f:
     nbf.write(nb, f)
 
