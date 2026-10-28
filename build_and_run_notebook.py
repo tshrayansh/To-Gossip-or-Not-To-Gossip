@@ -1,5 +1,6 @@
 """
-Script to build and execute BEE26_To_Gossip_or_Not_To_Gossip.ipynb with updated zero-overlap graphics.
+Script to build and execute BEE26_To_Gossip_or_Not_To_Gossip.ipynb with strict zero-overlap graphics.
+Rule: Zero text in the graph data area. Shared single legend in multi-panel figures.
 """
 
 import nbformat as nbf
@@ -52,6 +53,7 @@ This project systematically reconstructs the mathematical framework presented at
 cells.append(nbf.v4.new_code_cell(r"""import numpy as np
 import scipy.integrate as spi
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 
 # Global Typography & Clean Aesthetic Configuration (Zero-Overlap Guaranteed)
 plt.rcParams.update({
@@ -59,12 +61,12 @@ plt.rcParams.update({
     "font.family": "sans-serif",
     "font.size": 11,
     "axes.labelsize": 13,
-    "axes.titlesize": 14,
+    "axes.titlesize": 13.5,
     "axes.titleweight": "bold",
     "xtick.labelsize": 11,
     "ytick.labelsize": 11,
     "legend.fontsize": 11,
-    "figure.titlesize": 16,
+    "figure.titlesize": 15,
     "figure.titleweight": "bold",
     "figure.dpi": 150,
     "axes.spines.top": True,
@@ -79,13 +81,10 @@ plt.rcParams.update({
 
 # Strictly Unified Color Palette
 COLOR_GC = "#1a5fb4"        # Generous Cooperator (Cobalt Blue)
-COLOR_GC_MINUS = "#62a0ea"  # Plasmid-free GC (Light Blue)
 COLOR_GD = "#e66100"        # Generous Defector (Amber Orange)
-COLOR_GD_MINUS = "#f69846"  # Plasmid-free GD (Light Orange)
 COLOR_SC = "#26a269"        # Secretive Cooperator (Forest Green)
-COLOR_SC_MINUS = "#57e389"  # Plasmid-free SC (Mint Green)
-COLOR_SC_PLUS = "#8e24aa"   # Plasmid-bearing SC (Vibrant Purple)
 COLOR_SD = "#c01c28"        # Secretive Defector (Crimson Red)
+COLOR_SC_PLUS = "#8e24aa"   # Plasmid-bearing SC (Vibrant Purple)
 COLOR_SD_PLUS = "#681313"   # Plasmid-bearing SD (Deep Maroon)
 
 # Shading tones
@@ -180,42 +179,41 @@ for r in ratios:
     base_sweep.append(final / np.sum(final))
 base_sweep = np.array(base_sweep)
 
-# Clean, non-overlapping figure layout
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5.2))
+# Clean, non-overlapping figure layout (Zero text inside data area)
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 4.6), sharey=True)
 
 # Subplot 1: Trajectory
-ax1.plot(sol_base.t, sol_base.y[0], label="GC (Generous Cooperator)", color=COLOR_GC, linestyle="--", linewidth=2.0)
-ax1.plot(sol_base.t, sol_base.y[1], label="GD (Generous Defector)", color=COLOR_GD, linestyle="-.", linewidth=2.0)
-ax1.plot(sol_base.t, sol_base.y[2], label="SC (Secretive Cooperator)", color=COLOR_SC, linestyle=":", linewidth=2.0)
-ax1.plot(sol_base.t, sol_base.y[3], label="SD (Secretive Defector)", color=COLOR_SD, linestyle="-", linewidth=3.0)
-ax1.set_title("Base Model: Population Trajectory ($t \\in [0, 100]$)", pad=14)
+ax1.plot(sol_base.t, sol_base.y[0], color=COLOR_GC, linestyle="--", linewidth=2.0)
+ax1.plot(sol_base.t, sol_base.y[1], color=COLOR_GD, linestyle="-.", linewidth=2.0)
+ax1.plot(sol_base.t, sol_base.y[2], color=COLOR_SC, linestyle=":", linewidth=2.0)
+ax1.plot(sol_base.t, sol_base.y[3], color=COLOR_SD, linestyle="-", linewidth=3.0)
+ax1.set_title("Base Model: Population Trajectory ($t \\in [0, 100]$)", pad=10)
 ax1.set_xlabel("Time ($t$, generations)")
 ax1.set_ylabel("Population Fraction ($x_i$)")
-ax1.set_ylim(-0.02, 1.04)
-ax1.legend(loc="center right", framealpha=0.92)
+ax1.set_xlim(0, 100)
+ax1.set_ylim(-0.02, 1.05)
 
 # Subplot 2: Bifurcation (Slide 10)
-ax2.plot(ratios, base_sweep[:, 0], label="GC", color=COLOR_GC, linestyle="--", linewidth=2.0)
-ax2.plot(ratios, base_sweep[:, 1], label="GD", color=COLOR_GD, linestyle="-.", linewidth=2.0)
-ax2.plot(ratios, base_sweep[:, 2], label="SC", color=COLOR_SC, linestyle=":", linewidth=2.0)
-ax2.plot(ratios, base_sweep[:, 3], label="SD", color=COLOR_SD, linestyle="-", linewidth=3.0)
+ax2.plot(ratios, base_sweep[:, 0], color=COLOR_GC, linestyle="--", linewidth=2.0)
+ax2.plot(ratios, base_sweep[:, 1], color=COLOR_GD, linestyle="-.", linewidth=2.0)
+ax2.plot(ratios, base_sweep[:, 2], color=COLOR_SC, linestyle=":", linewidth=2.0)
+ax2.plot(ratios, base_sweep[:, 3], color=COLOR_SD, linestyle="-", linewidth=3.0)
 ax2.axvspan(0.0, 2.0, color=SHADE_SD, alpha=0.35)
-ax2.set_title("Base Model: Steady State vs $f_s / f_c$ (Slide 10)", pad=14)
+ax2.set_title("Base Model: Steady State vs $f_s / f_c$ (Slide 10)", pad=10)
 ax2.set_xlabel(r"Ratio of HGT Cost to Cooperation Cost ($f_s / f_c$)")
-ax2.set_ylabel("Steady-State Fraction ($x_i^*$)")
-ax2.set_ylim(-0.04, 1.15)
-ax2.text(1.0, 1.06, "SD DOMINANCE REGIME (100% Defection)",
-         ha="center", va="center", color=COLOR_SD, fontweight="bold",
-         bbox=dict(boxstyle="round,pad=0.25", facecolor="white", edgecolor=COLOR_SD, linewidth=1.0))
-ax2.text(1.0, 0.50,
-         "Cooperation and HGT are eliminated:\n"
-         "• GC pays double penalty: f_GC = 1 - f_c < f_SD = 1 + f_s\n"
-         "• Conjugation halts as donor frequency GC -> 0",
-         ha="center", va="center", fontsize=10, color="#333333",
-         bbox=dict(boxstyle="square,pad=0.5", facecolor="#ffffff", edgecolor="#cccccc", alpha=0.9))
-ax2.legend(loc="center left", framealpha=0.92)
+ax2.set_xlim(0.0, 2.0)
+
+# Single shared legend placed ONCE outside data area
+handles = [
+    Line2D([0], [0], color=COLOR_GC, linestyle="--", linewidth=2.0, label="GC (Generous Cooperator)"),
+    Line2D([0], [0], color=COLOR_GD, linestyle="-.", linewidth=2.0, label="GD (Generous Defector)"),
+    Line2D([0], [0], color=COLOR_SC, linestyle=":", linewidth=2.0, label="SC (Secretive Cooperator)"),
+    Line2D([0], [0], color=COLOR_SD, linestyle="-", linewidth=2.8, label="SD (Secretive Defector)")
+]
+fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 1.04), ncol=4, framealpha=0.95, edgecolor="#cccccc")
 
 plt.tight_layout()
+plt.subplots_adjust(top=0.86)
 plt.show()
 """))
 
@@ -301,20 +299,20 @@ for r in ratios:
     indep_sweep.append(final / np.sum(final))
 indep_sweep = np.array(indep_sweep)
 
-# Clean, non-overlapping figure layout
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5.2))
+# Clean, non-overlapping figure layout (Zero text inside data area)
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 4.6), sharey=True)
 
 # Subplot 1: Trajectory
-ax1.plot(sol_indep.t, sol_indep.y[0] + sol_indep.y[1], label="GC Total", color=COLOR_GC, linestyle="--", linewidth=2.0)
-ax1.plot(sol_indep.t, sol_indep.y[2] + sol_indep.y[3], label="GD Total", color=COLOR_GD, linestyle="-.", linewidth=2.0)
-ax1.plot(sol_indep.t, sol_indep.y[4] + sol_indep.y[5], label="SC Total", color=COLOR_SC, linestyle=":", linewidth=2.0)
-ax1.plot(sol_indep.t, sol_indep.y[6], label="$SD_+$ (Plasmid Defector)", color=COLOR_SD, linestyle="-", linewidth=3.0)
-ax1.plot(sol_indep.t, sol_indep.y[7], label="$SD_-$ (Plasmid-Free Defector)", color=COLOR_SD_PLUS, linestyle=":", linewidth=2.0)
-ax1.set_title("Independent Plasmid: Trajectory ($t \\in [0, 100]$)", pad=14)
+ax1.plot(sol_indep.t, sol_indep.y[0] + sol_indep.y[1], color=COLOR_GC, linestyle="--", linewidth=2.0)
+ax1.plot(sol_indep.t, sol_indep.y[2] + sol_indep.y[3], color=COLOR_GD, linestyle="-.", linewidth=2.0)
+ax1.plot(sol_indep.t, sol_indep.y[4] + sol_indep.y[5], color=COLOR_SC, linestyle=":", linewidth=2.0)
+ax1.plot(sol_indep.t, sol_indep.y[6], color=COLOR_SD, linestyle="-", linewidth=3.0)
+ax1.plot(sol_indep.t, sol_indep.y[7], color=COLOR_SD_PLUS, linestyle=":", linewidth=2.0)
+ax1.set_title("Independent Plasmid: Trajectory ($t \\in [0, 100]$)", pad=10)
 ax1.set_xlabel("Time ($t$, generations)")
 ax1.set_ylabel("Population Fraction ($x_i$)")
-ax1.set_ylim(-0.02, 1.04)
-ax1.legend(loc="center right", framealpha=0.92)
+ax1.set_xlim(0, 100)
+ax1.set_ylim(-0.02, 1.05)
 
 # Subplot 2: Bifurcation (Slide 15)
 total_sd = indep_sweep[:, 6] + indep_sweep[:, 7]
@@ -322,28 +320,28 @@ total_gc = indep_sweep[:, 0] + indep_sweep[:, 1]
 total_gd = indep_sweep[:, 2] + indep_sweep[:, 3]
 total_sc = indep_sweep[:, 4] + indep_sweep[:, 5]
 
-ax2.plot(ratios, total_gc, label="GC Total", color=COLOR_GC, linestyle="--", linewidth=2.0)
-ax2.plot(ratios, total_gd, label="GD Total", color=COLOR_GD, linestyle="-.", linewidth=2.0)
-ax2.plot(ratios, total_sc, label="SC Total", color=COLOR_SC, linestyle=":", linewidth=2.0)
-ax2.plot(ratios, total_sd, label="SD Total", color=COLOR_SD, linestyle="-", linewidth=3.0)
-ax2.plot(ratios, indep_sweep[:, 6], label=r"$SD_+$", color=COLOR_SD_PLUS, linestyle="--", linewidth=2.0)
+ax2.plot(ratios, total_gc, color=COLOR_GC, linestyle="--", linewidth=2.0)
+ax2.plot(ratios, total_gd, color=COLOR_GD, linestyle="-.", linewidth=2.0)
+ax2.plot(ratios, total_sc, color=COLOR_SC, linestyle=":", linewidth=2.0)
+ax2.plot(ratios, total_sd, color=COLOR_SD, linestyle="-", linewidth=3.0)
+ax2.plot(ratios, indep_sweep[:, 6], color=COLOR_SD_PLUS, linestyle="--", linewidth=2.0)
 ax2.axvspan(0.0, 2.0, color=SHADE_SD, alpha=0.35)
-ax2.set_title("Independent Plasmid: Steady State vs $f_s / f_c$ (Slide 15)", pad=14)
+ax2.set_title("Independent Plasmid: Steady State vs $f_s / f_c$ (Slide 15)", pad=10)
 ax2.set_xlabel(r"Ratio of HGT Cost to Cooperation Cost ($f_s / f_c$)")
-ax2.set_ylabel("Steady-State Fraction ($x_i^*$)")
-ax2.set_ylim(-0.04, 1.15)
-ax2.text(1.0, 1.06, "SD+ FIXATION REGIME (Defectors Parasitize Plasmid)",
-         ha="center", va="center", color=COLOR_SD, fontweight="bold",
-         bbox=dict(boxstyle="round,pad=0.25", facecolor="white", edgecolor=COLOR_SD, linewidth=1.0))
-ax2.text(1.0, 0.50,
-         "Plasmid benefit f_+ aids all hosts equally:\n"
-         "• Defectors acquire plasmid via conjugation\n"
-         "• f_SD+ = 1 + f_s + f_+ remains strictly superior",
-         ha="center", va="center", fontsize=10, color="#333333",
-         bbox=dict(boxstyle="square,pad=0.5", facecolor="#ffffff", edgecolor="#cccccc", alpha=0.9))
-ax2.legend(loc="center right", framealpha=0.92)
+ax2.set_xlim(0.0, 2.0)
+
+# Single shared legend placed ONCE outside data area
+handles_indep = [
+    Line2D([0], [0], color=COLOR_GC, linestyle="--", linewidth=2.0, label="GC Total"),
+    Line2D([0], [0], color=COLOR_GD, linestyle="-.", linewidth=2.0, label="GD Total"),
+    Line2D([0], [0], color=COLOR_SC, linestyle=":", linewidth=2.0, label="SC Total"),
+    Line2D([0], [0], color=COLOR_SD, linestyle="-", linewidth=2.8, label="SD Total"),
+    Line2D([0], [0], color=COLOR_SD_PLUS, linestyle="--", linewidth=2.0, label=r"$SD_+$ (Plasmid Defector)")
+]
+fig.legend(handles=handles_indep, loc="upper center", bbox_to_anchor=(0.5, 1.04), ncol=5, framealpha=0.95, edgecolor="#cccccc")
 
 plt.tight_layout()
+plt.subplots_adjust(top=0.86)
 plt.show()
 """))
 
@@ -416,47 +414,22 @@ for r in ratios_fplus:
     dep_sweep.append(final / np.sum(final))
 dep_sweep = np.array(dep_sweep)
 
-fig, ax = plt.subplots(figsize=(9.5, 5.4))
-ax.plot(ratios_fplus, dep_sweep[:, 0], label="$GC_+$", color=COLOR_GC, linestyle="--", linewidth=2.0)
-ax.plot(ratios_fplus, dep_sweep[:, 1], label="$GC_-$", color=COLOR_GC_MINUS, linestyle=":", linewidth=1.8)
-ax.plot(ratios_fplus, dep_sweep[:, 2], label="GD", color=COLOR_GD, linestyle="-.", linewidth=2.0)
-ax.plot(ratios_fplus, dep_sweep[:, 3], label="$SC_+$ (Beneficial Cooperator)", color=COLOR_SC_PLUS, linewidth=3.0)
-ax.plot(ratios_fplus, dep_sweep[:, 4], label="$SC_-$", color=COLOR_SC, linestyle=":", linewidth=1.8)
-ax.plot(ratios_fplus, dep_sweep[:, 5], label="SD (Secretive Defector)", color=COLOR_SD, linewidth=3.0)
-
-# Shaded background zones matching Slide 20
+fig, ax = plt.subplots(figsize=(8.8, 4.8))
+# Shaded background zones (no text inside data area!)
 ax.axvspan(0.0, 0.95, color=SHADE_SD, alpha=0.35)
 ax.axvspan(0.95, 1.05, color=SHADE_COEX, alpha=0.6)
 ax.axvspan(1.05, 2.0, color=SHADE_SC_PLUS, alpha=0.35)
 
-ax.set_title("Dependent Beneficial Plasmid Model — Steady State vs $f_+ / f_c$ (Slide 20)", pad=16)
+ax.plot(ratios_fplus, dep_sweep[:, 0], label="GC ($GC_+$)", color=COLOR_GC, linestyle="--", linewidth=2.0)
+ax.plot(ratios_fplus, dep_sweep[:, 2], label="GD", color=COLOR_GD, linestyle="-.", linewidth=2.0)
+ax.plot(ratios_fplus, dep_sweep[:, 3], label=r"$SC_+$ (Beneficial Cooperator)", color=COLOR_SC_PLUS, linestyle="-", linewidth=3.0)
+ax.plot(ratios_fplus, dep_sweep[:, 5], label="SD (Secretive Defector)", color=COLOR_SD, linestyle="-", linewidth=3.0)
+
+ax.set_title("Dependent Beneficial Plasmid Model — Steady State vs $f_+ / f_c$ (Slide 20)", pad=14)
 ax.set_xlabel(r"Ratio of Plasmid Benefit to Cooperation Cost ($f_+ / f_c$)")
 ax.set_ylabel("Steady-State Fraction ($x_i^*$)")
 ax.set_xlim(0.0, 2.0)
-ax.set_ylim(-0.04, 1.15)
-
-# Header banner strip
-ax.text(0.48, 1.07, "SD Dominance", fontsize=11, fontweight="bold", color=COLOR_SD, ha="center",
-        bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor=COLOR_SD, linewidth=1.0))
-ax.text(1.0, 1.07, "Coexistence", fontsize=10, fontweight="bold", color="#d46b08", ha="center",
-        bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor="#d46b08", linewidth=1.0))
-ax.text(1.52, 1.07, r"$SC_+$ Dominance (Cooperation Rescued)", fontsize=11, fontweight="bold", color=COLOR_SC_PLUS, ha="center",
-        bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor=COLOR_SC_PLUS, linewidth=1.0))
-
-# Clear annotations in guaranteed empty lower-left and lower-right corners
-ax.text(0.35, 0.40,
-        r"$f_+ < f_c$" "\n"
-        "Defection wins\n"
-        r"$f_{SD} > f_{SC_+}$",
-        ha="center", va="center", fontsize=10, color=COLOR_SD,
-        bbox=dict(boxstyle="square,pad=0.4", facecolor="#ffffff", edgecolor=COLOR_SD, alpha=0.85))
-
-ax.text(1.60, 0.40,
-        r"$f_+ > f_c$" "\n"
-        "Cooperation wins\n"
-        r"$f_{SC_+} > f_{SD}$",
-        ha="center", va="center", fontsize=10, color=COLOR_SC_PLUS,
-        bbox=dict(boxstyle="square,pad=0.4", facecolor="#ffffff", edgecolor=COLOR_SC_PLUS, alpha=0.85))
+ax.set_ylim(-0.02, 1.05)
 
 ax.legend(bbox_to_anchor=(1.02, 1.0), loc="upper left", framealpha=0.95, borderpad=0.7, edgecolor="#cccccc")
 
@@ -529,53 +502,28 @@ cells.append(nbf.v4.new_code_cell(r"""def synergy_model_ode(t, y, alpha, fc, fs,
 ratios_fpc = np.linspace(0.0, 2.0, 101)
 y0_synergy = [0.25, 0.25, 0.25, 0.25]
 synergy_sweep = []
-# Finite horizon T=50 captures the observable coexistence regime and critical slowing down (Slide 24)
 for r in ratios_fpc:
-    fpc = r * (fs + fc)
-    sol = spi.solve_ivp(synergy_model_ode, (0, 50), y0_synergy, args=(alpha, fc, fs, fpc), method='RK45')
+    sol = spi.solve_ivp(synergy_model_ode, (0, 50), y0_synergy, args=(alpha, fc, fs, r * (fs + fc)), method='RK45')
     final = np.maximum(0, sol.y[:, -1])
     synergy_sweep.append(final / np.sum(final))
-synergy_sweep = np.array(synergy_sweep)
+results_synergy = np.array(synergy_sweep)
 
-fig, ax = plt.subplots(figsize=(9.5, 5.4))
-ax.plot(ratios_fpc, synergy_sweep[:, 0], label="GC (Generous Cooperator)", color=COLOR_GC, linewidth=3.0)
-ax.plot(ratios_fpc, synergy_sweep[:, 1], label="GD (Generous Defector)", color=COLOR_GD, linestyle="-.", linewidth=2.0)
-ax.plot(ratios_fpc, synergy_sweep[:, 2], label="SC (Secretive Cooperator)", color=COLOR_SC, linestyle=":", linewidth=2.0)
-ax.plot(ratios_fpc, synergy_sweep[:, 3], label="SD (Secretive Defector)", color=COLOR_SD, linewidth=3.0)
-
-# Shaded background regimes matching Slide 24
+fig, ax = plt.subplots(figsize=(8.8, 4.8))
+# Shaded background zones (no text inside data area!)
 ax.axvspan(0.0, 0.65, color=SHADE_SD, alpha=0.35)
 ax.axvspan(0.65, 0.95, color=SHADE_COEX, alpha=0.6)
 ax.axvspan(0.95, 2.0, color=SHADE_GC, alpha=0.35)
 
-ax.set_title(r"Plasmid–Chromosome Synergy Model — Steady State (Slide 24)", pad=16)
+ax.plot(ratios_fpc, results_synergy[:, 0], label="GC (Generous Cooperator)", color=COLOR_GC, linestyle="-", linewidth=3.0)
+ax.plot(ratios_fpc, results_synergy[:, 1], label="GD (Generous Defector)", color=COLOR_GD, linestyle="-.", linewidth=2.0)
+ax.plot(ratios_fpc, results_synergy[:, 2], label="SC (Secretive Cooperator)", color=COLOR_SC, linestyle=":", linewidth=2.0)
+ax.plot(ratios_fpc, results_synergy[:, 3], label="SD (Secretive Defector)", color=COLOR_SD, linestyle="-", linewidth=3.0)
+
+ax.set_title(r"Plasmid–Chromosome Synergy Model — Steady State (Slide 24)", pad=14)
 ax.set_xlabel(r"Synergy Parameter $\Gamma = f_{pc} / (f_s + f_c)$")
 ax.set_ylabel("Steady-State Fraction ($x_i^*$)")
 ax.set_xlim(0.0, 2.0)
-ax.set_ylim(-0.04, 1.15)
-
-# Dedicated header banner strip for regimes
-ax.text(0.32, 1.07, "SD Dominance", fontsize=11, fontweight="bold", color=COLOR_SD, ha="center",
-        bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor=COLOR_SD, linewidth=1.0))
-ax.text(0.80, 1.07, "Coexistence", fontsize=10, fontweight="bold", color="#d46b08", ha="center",
-        bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor="#d46b08", linewidth=1.0))
-ax.text(1.48, 1.07, "GC Dominance (HGT & Cooperation Win!)", fontsize=11, fontweight="bold", color=COLOR_GC, ha="center",
-        bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor=COLOR_GC, linewidth=1.0))
-
-# Clear annotations in guaranteed empty lower-left and lower-right corners
-ax.text(0.32, 0.35,
-        r"$\Gamma < 0.7$" "\n"
-        "Synergy too low\n"
-        r"$SD$ fixes",
-        ha="center", va="center", fontsize=10, color=COLOR_SD,
-        bbox=dict(boxstyle="square,pad=0.4", facecolor="#ffffff", edgecolor=COLOR_SD, alpha=0.85))
-
-ax.text(1.48, 0.35,
-        r"$\Gamma > 1.1$" "\n"
-        "Synergy overcomes costs\n"
-        r"$GC$ achieves 100% fixation",
-        ha="center", va="center", fontsize=10, color=COLOR_GC,
-        bbox=dict(boxstyle="square,pad=0.4", facecolor="#ffffff", edgecolor=COLOR_GC, alpha=0.85))
+ax.set_ylim(-0.02, 1.05)
 
 ax.legend(bbox_to_anchor=(1.02, 1.0), loc="upper left", framealpha=0.95, borderpad=0.7, edgecolor="#cccccc")
 
@@ -593,96 +541,76 @@ cells.append(nbf.v4.new_markdown_cell(r"""### Inferences from Plasmid-Chromosome
 cells.append(nbf.v4.new_markdown_cell(r"""---
 ## 5. Master Comparative Synthesis (All 4 Models)
 
-The master figure below compiles the steady-state outcomes of all four evolutionary models:
+The master figure below compiles the steady-state outcomes of all four evolutionary models with a **single unified legend**:
 """))
 
-cells.append(nbf.v4.new_code_cell(r"""fig, axes = plt.subplots(2, 2, figsize=(16, 11))
+cells.append(nbf.v4.new_code_cell(r"""fig, axes = plt.subplots(2, 2, figsize=(14, 9.5), sharey=True)
 
 # Panel (a): Base Model
 ax = axes[0, 0]
-ax.plot(ratios, base_sweep[:, 0], label="GC", color=COLOR_GC, linestyle="--", linewidth=1.8)
-ax.plot(ratios, base_sweep[:, 1], label="GD", color=COLOR_GD, linestyle="-.", linewidth=1.8)
-ax.plot(ratios, base_sweep[:, 2], label="SC", color=COLOR_SC, linestyle=":", linewidth=1.8)
-ax.plot(ratios, base_sweep[:, 3], label="SD", color=COLOR_SD, linewidth=2.8)
+ax.plot(ratios, base_sweep[:, 0], color=COLOR_GC, linestyle="--", linewidth=2.0)
+ax.plot(ratios, base_sweep[:, 1], color=COLOR_GD, linestyle="-.", linewidth=2.0)
+ax.plot(ratios, base_sweep[:, 2], color=COLOR_SC, linestyle=":", linewidth=2.0)
+ax.plot(ratios, base_sweep[:, 3], color=COLOR_SD, linestyle="-", linewidth=3.0)
 ax.axvspan(0.0, 2.0, color=SHADE_SD, alpha=0.35)
-ax.set_title("(a) Base Model: Costly HGT & Cooperation", pad=12)
+ax.set_title("(a) Base Model: Costly HGT & Cooperation", pad=10)
 ax.set_xlabel(r"$f_s / f_c$")
 ax.set_ylabel("Steady-State Fraction ($x_i^*$)")
-ax.set_ylim(-0.04, 1.15)
-ax.text(1.0, 1.06, "SD Fixation (100% Defection)", ha="center", va="center", color=COLOR_SD, fontweight="bold",
-        bbox=dict(boxstyle="round,pad=0.25", facecolor="white", edgecolor=COLOR_SD, linewidth=1.0))
-ax.text(1.0, 0.50, "GC pays double penalty (fc + fs)\nConjugation ceases as GC -> 0",
-        ha="center", va="center", fontsize=10, color="#333333",
-        bbox=dict(boxstyle="square,pad=0.5", facecolor="#ffffff", edgecolor="#cccccc", alpha=0.9))
-ax.legend(loc="center left", framealpha=0.92)
+ax.set_xlim(0.0, 2.0)
+ax.set_ylim(-0.02, 1.05)
 
 # Panel (b): Independent Beneficial Plasmid
 ax = axes[0, 1]
-ax.plot(ratios, total_gc, label="Total GC", color=COLOR_GC, linestyle="--", linewidth=1.8)
-ax.plot(ratios, total_gd, label="Total GD", color=COLOR_GD, linestyle="-.", linewidth=1.8)
-ax.plot(ratios, total_sc, label="Total SC", color=COLOR_SC, linestyle=":", linewidth=1.8)
-ax.plot(ratios, total_sd, label="Total SD", color=COLOR_SD, linewidth=2.8)
-ax.plot(ratios, indep_sweep[:, 6], label=r"$SD_+$", color=COLOR_SD_PLUS, linestyle="--", linewidth=1.8)
+ax.plot(ratios, total_gc, color=COLOR_GC, linestyle="--", linewidth=2.0)
+ax.plot(ratios, total_gd, color=COLOR_GD, linestyle="-.", linewidth=2.0)
+ax.plot(ratios, total_sc, color=COLOR_SC, linestyle=":", linewidth=2.0)
+ax.plot(ratios, total_sd, color=COLOR_SD, linestyle="-", linewidth=3.0)
+ax.plot(ratios, indep_sweep[:, 6], color=COLOR_SD_PLUS, linestyle="--", linewidth=1.8)
 ax.axvspan(0.0, 2.0, color=SHADE_SD, alpha=0.35)
-ax.set_title("(b) Independent Beneficial Plasmid Model", pad=12)
+ax.set_title("(b) Independent Beneficial Plasmid Model", pad=10)
 ax.set_xlabel(r"$f_s / f_c$")
-ax.set_ylabel("Steady-State Fraction ($x_i^*$)")
-ax.set_ylim(-0.04, 1.15)
-ax.text(1.0, 1.06, "SD+ Fixation (Plasmid Parasitized)", ha="center", va="center", color=COLOR_SD, fontweight="bold",
-        bbox=dict(boxstyle="round,pad=0.25", facecolor="white", edgecolor=COLOR_SD, linewidth=1.0))
-ax.text(1.0, 0.50, "Independent benefit f_+ aids all hosts\nRelative fitness advantage favors defectors",
-        ha="center", va="center", fontsize=10, color="#333333",
-        bbox=dict(boxstyle="square,pad=0.5", facecolor="#ffffff", edgecolor="#cccccc", alpha=0.9))
-ax.legend(loc="center right", framealpha=0.92)
+ax.set_xlim(0.0, 2.0)
 
 # Panel (c): Dependent Beneficial Plasmid
 ax = axes[1, 0]
-ax.plot(ratios_fplus, dep_sweep[:, 0], label="$GC_+$", color=COLOR_GC, linestyle="--", linewidth=1.8)
-ax.plot(ratios_fplus, dep_sweep[:, 2], label="GD", color=COLOR_GD, linestyle="-.", linewidth=1.8)
-ax.plot(ratios_fplus, dep_sweep[:, 3], label="$SC_+$", color=COLOR_SC_PLUS, linewidth=2.8)
-ax.plot(ratios_fplus, dep_sweep[:, 5], label="SD", color=COLOR_SD, linewidth=2.8)
 ax.axvspan(0.0, 0.95, color=SHADE_SD, alpha=0.35)
 ax.axvspan(0.95, 1.05, color=SHADE_COEX, alpha=0.6)
 ax.axvspan(1.05, 2.0, color=SHADE_SC_PLUS, alpha=0.35)
-ax.set_title("(c) Dependent Beneficial Plasmid Model", pad=12)
+ax.plot(ratios_fplus, dep_sweep[:, 0], color=COLOR_GC, linestyle="--", linewidth=2.0)
+ax.plot(ratios_fplus, dep_sweep[:, 2], color=COLOR_GD, linestyle="-.", linewidth=2.0)
+ax.plot(ratios_fplus, dep_sweep[:, 3], color=COLOR_SC_PLUS, linestyle="-", linewidth=3.0)
+ax.plot(ratios_fplus, dep_sweep[:, 5], color=COLOR_SD, linestyle="-", linewidth=3.0)
+ax.set_title("(c) Dependent Beneficial Plasmid Model", pad=10)
 ax.set_xlabel(r"$f_+ / f_c$")
 ax.set_ylabel("Steady-State Fraction ($x_i^*$)")
-ax.set_ylim(-0.04, 1.15)
-ax.text(0.45, 1.06, "SD Dominance", ha="center", va="center", color=COLOR_SD, fontweight="bold", fontsize=10,
-        bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor=COLOR_SD))
-ax.text(1.0, 1.06, "Coex", ha="center", va="center", color="#d46b08", fontweight="bold", fontsize=9,
-        bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="#d46b08"))
-ax.text(1.55, 1.06, "$SC_+$ Dominance", ha="center", va="center", color=COLOR_SC_PLUS, fontweight="bold", fontsize=10,
-        bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor=COLOR_SC_PLUS))
-ax.text(0.35, 0.35, r"$f_+ < f_c$" "\nDefection wins", ha="center", va="center", fontsize=9, color=COLOR_SD)
-ax.text(1.55, 0.35, r"$f_+ > f_c$" "\nCooperation saved\nHGT remains extinct", ha="center", va="center", fontsize=9, color=COLOR_SC_PLUS)
-ax.legend(loc="center left", framealpha=0.92)
+ax.set_xlim(0.0, 2.0)
 
 # Panel (d): Plasmid-Chromosome Synergy
 ax = axes[1, 1]
-ax.plot(ratios_fpc, synergy_sweep[:, 0], label="GC", color=COLOR_GC, linewidth=2.8)
-ax.plot(ratios_fpc, synergy_sweep[:, 1], label="GD", color=COLOR_GD, linestyle="-.", linewidth=1.8)
-ax.plot(ratios_fpc, synergy_sweep[:, 2], label="SC", color=COLOR_SC, linestyle=":", linewidth=1.8)
-ax.plot(ratios_fpc, synergy_sweep[:, 3], label="SD", color=COLOR_SD, linewidth=2.8)
 ax.axvspan(0.0, 0.65, color=SHADE_SD, alpha=0.35)
 ax.axvspan(0.65, 0.95, color=SHADE_COEX, alpha=0.6)
 ax.axvspan(0.95, 2.0, color=SHADE_GC, alpha=0.35)
-ax.set_title("(d) Plasmid–Chromosome Synergy Model", pad=12)
+ax.plot(ratios_fpc, results_synergy[:, 0], color=COLOR_GC, linestyle="-", linewidth=3.0)
+ax.plot(ratios_fpc, results_synergy[:, 1], color=COLOR_GD, linestyle="-.", linewidth=2.0)
+ax.plot(ratios_fpc, results_synergy[:, 2], color=COLOR_SC, linestyle=":", linewidth=2.0)
+ax.plot(ratios_fpc, results_synergy[:, 3], color=COLOR_SD, linestyle="-", linewidth=3.0)
+ax.set_title(r"(d) Plasmid–Chromosome Synergy Model", pad=10)
 ax.set_xlabel(r"$\Gamma = f_{pc} / (f_s + f_c)$")
-ax.set_ylabel("Steady-State Fraction ($x_i^*$)")
-ax.set_ylim(-0.04, 1.15)
-ax.text(0.32, 1.06, "SD Dominance", ha="center", va="center", color=COLOR_SD, fontweight="bold", fontsize=10,
-        bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor=COLOR_SD))
-ax.text(0.80, 1.06, "Coexistence", ha="center", va="center", color="#d46b08", fontweight="bold", fontsize=9,
-        bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="#d46b08"))
-ax.text(1.48, 1.06, "GC Dominance", ha="center", va="center", color=COLOR_GC, fontweight="bold", fontsize=10,
-        bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor=COLOR_GC))
-ax.text(0.32, 0.35, r"$\Gamma < 0.7$" "\n$SD$ fixes", ha="center", va="center", fontsize=9, color=COLOR_SD)
-ax.text(1.48, 0.35, r"$\Gamma > 1.1$" "\nBoth HGT & Cooperation\nachieve 100% fixation", ha="center", va="center", fontsize=9, color=COLOR_GC)
-ax.legend(loc="center left", framealpha=0.92)
+ax.set_xlim(0.0, 2.0)
 
-plt.suptitle("Evolutionary Dynamics of Horizontal Gene Transfer: 4-Model Comparison", fontsize=16, y=0.99)
-plt.subplots_adjust(hspace=0.32, wspace=0.24)
+# Single shared legend placed ONCE at top of the entire figure!
+shared_legend = [
+    Line2D([0], [0], color=COLOR_GC, linestyle="-", linewidth=2.5, label="GC (Generous Cooperator)"),
+    Line2D([0], [0], color=COLOR_GD, linestyle="-.", linewidth=2.0, label="GD (Generous Defector)"),
+    Line2D([0], [0], color=COLOR_SC, linestyle=":", linewidth=2.0, label="SC (Secretive Cooperator)"),
+    Line2D([0], [0], color=COLOR_SD, linestyle="-", linewidth=2.8, label="SD (Secretive Defector)"),
+    Line2D([0], [0], color=COLOR_SC_PLUS, linestyle="-", linewidth=2.8, label=r"$SC_+$ (Beneficial Plasmid Cooperator)"),
+    Line2D([0], [0], color=COLOR_SD_PLUS, linestyle="--", linewidth=2.0, label=r"$SD_+$ (Plasmid Defector)")
+]
+fig.legend(handles=shared_legend, loc="upper center", bbox_to_anchor=(0.5, 0.98), ncol=3, framealpha=0.95, edgecolor="#cccccc")
+
+plt.suptitle("Evolutionary Dynamics of Horizontal Gene Transfer: 4-Model Comparison", fontsize=15, y=1.02)
+plt.subplots_adjust(top=0.88, hspace=0.30, wspace=0.18)
 plt.show()
 """))
 
